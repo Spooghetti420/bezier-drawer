@@ -32,7 +32,7 @@ public:
     Interpolation()
     {
         sAppName = "Bezier Curve Demo";
-        olc::vd2d firstPoint = olc::vd2d( 480.0, 480.0); 
+        olc::vd2d firstPoint = olc::vd2d(480.0, 480.0); 
         points.push_back(firstPoint);
     }
 public:
