@@ -29,6 +29,11 @@ public:
     int frameCount = 0;
     int bezierAnimationTimer = 100;
     int stepDirection = 1;
+
+    int prevAnimationTimer = bezierAnimationTimer;
+    std::vector<olc::vd2d> prevPoints = {};
+    olc::vd2d prevMouse = olc::vd2d(0, 0);
+
     Interpolation()
     {
         sAppName = "Bezier Curve Demo";
@@ -86,16 +91,6 @@ public:
             points[selectedPoint].y = mouseY;
         }
 
-        Clear(olc::BLACK);
-        for (auto p : points) {
-            double distance = (p-mousePosition).mag2();
-            float radius = 10;
-            if (distance < draggingDistance) {
-                radius *= 1.5;
-            }
-
-            FillCircle(p, radius);
-        }
         frameCount++;
         if (stepDirection == 1) {
             if (bezierAnimationTimer < 100) {
@@ -107,11 +102,32 @@ public:
             }
         }
 
+        if (bezierAnimationTimer == prevAnimationTimer && points == prevPoints && mousePosition == prevMouse) {
+            // Skip some rendering if nothing has changed.
+            return true;
+        }
+
+        Clear(olc::BLACK);
+        for (auto p : points) {
+            double distance = (p-mousePosition).mag2();
+            float radius = 10;
+            if (distance < draggingDistance) {
+                radius *= 1.5;
+            }
+
+            FillCircle(p, radius);
+        }
+
         double t = (bezierAnimationTimer%101)/100.0;
         if (bezierAnimationTimer != 0 && bezierAnimationTimer != 100) {
-        FillCircle(interpolateBezier(points, t), 20, olc::RED);
+            FillCircle(interpolateBezier(points, t), 20, olc::RED);
         }
         drawBezier(points, t, 0.01);
+
+        prevAnimationTimer = bezierAnimationTimer;
+        prevPoints = points;
+        prevMouse = mousePosition;
+
         return true;
     }
 private:
